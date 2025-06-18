@@ -1,17 +1,17 @@
 # Medical Multimodal Assistant Chatbot
 
-This project provides a skeleton implementation of a web-based medical assistant chatbot powered by the `Lingshu-7B-GGUF` model. It includes placeholders for features such as retrieval augmented generation (RAG), web search integration, a long chain-of-thought reasoning system, episodic memory, localization, user management, and an admin panel.
+This project implements a web-based medical assistant chatbot powered by the `Lingshu-7B-GGUF` model. It includes retrieval augmented generation utilities, web search integration, a chain-of-thought reasoning system, episodic memory, localization, user management with registration and login, and a small admin panel.
 
 ## Project Structure
 
 - `frontend/` – simple web interface files
 - `backend/` – Flask backend serving the chatbot API
-- `rag/`, `websearch/`, `reasoning/`, `episodic_memory/` – placeholders for core assistant features
+- `rag/`, `websearch/`, `reasoning/`, `episodic_memory/` – helper modules for the assistant
 - `localization/` – example locale JSON files
 - `user_system/`, `admin_panel/` – entry points for user management and admin tooling
 - `gpu_support/` – utilities for GPU detection
 
-Each folder currently provides only minimal code so that future development can easily build upon it.
+All components provide simple yet working functionality so the project can be run end to end.
 
 ## Running
 
@@ -24,5 +24,5 @@ python backend/app.py  # simple API
 python webui.py        # Gradio web interface
 ```
 
-Then open `frontend/index.html` in a browser to interact with the placeholder chatbot interface.
+Then open `frontend/index.html` in a browser to interact with the chatbot interface.
 

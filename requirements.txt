@@ -8,3 +8,6 @@ Pillow
 transformers
 spaces
 llama-cpp-python
+duckduckgo_search
+pdfminer.six
+python-docx
