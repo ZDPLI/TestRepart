@@ -1,3 +1,9 @@
 numpy
 torch
 flask
+gradio
+opencv-python
+loguru
+Pillow
+transformers
+spaces

@@ -15,11 +15,12 @@ Each folder currently provides only minimal code so that future development can 
 
 ## Running
 
-Install dependencies from `requirements.txt` and launch the backend:
+Install dependencies from `requirements.txt` and launch the backend or the demo Gradio interface:
 
 ```bash
 pip install -r requirements.txt
-python backend/app.py
+python backend/app.py  # simple API
+python webui.py        # Gradio web interface
 ```
 
 Then open `frontend/index.html` in a browser to interact with the placeholder chatbot interface.
