@@ -1,2 +1,13 @@
 numpy
 torch
+flask
+gradio
+opencv-python
+loguru
+Pillow
+transformers
+spaces
+llama-cpp-python
+duckduckgo_search
+pdfminer.six
+python-docx
