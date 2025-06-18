@@ -10,17 +10,28 @@ import spaces
 import torch
 from loguru import logger
 from PIL import Image
-from transformers import AutoProcessor, AutoModelForImageTextToText, TextIteratorStreamer, Qwen2_5_VLForConditionalGeneration
+from transformers import (
+    AutoProcessor,
+    AutoModelForImageTextToText,
+    TextIteratorStreamer,
+    Qwen2_5_VLForConditionalGeneration,
+)
 from qwen_vl_utils import process_vision_info
 
-# Load Lingshu model
+# Load Lingshu model from local gguf files
+MODEL_DIR = os.getenv("LINGSHU_MODEL_DIR", "models")
+GGUF_PATH = os.path.join(MODEL_DIR, "Lingshu-7B.Q8_0.gguf")
+MMPROJ_PATH = os.path.join(MODEL_DIR, "Lingshu-7B.mmproj-f16.gguf")
+
 model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-    "lingshu-medical-mllm/Lingshu-7B",
+    GGUF_PATH,
     torch_dtype=torch.bfloat16,
     device_map="auto",
+    mmproj_file=MMPROJ_PATH,
+    local_files_only=True,
 )
 
-processor = AutoProcessor.from_pretrained("lingshu-medical-mllm/Lingshu-7B")
+processor = AutoProcessor.from_pretrained(GGUF_PATH, local_files_only=True)
 
 MAX_NUM_IMAGES = int(os.getenv("MAX_NUM_IMAGES", "5"))
 

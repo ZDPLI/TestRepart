@@ -15,7 +15,8 @@ Each folder currently provides only minimal code so that future development can 
 
 ## Running
 
-Install dependencies from `requirements.txt` and launch the backend or the demo Gradio interface:
+Install dependencies from `requirements.txt`. Place the model files
+`Lingshu-7B.Q8_0.gguf` and `Lingshu-7B.mmproj-f16.gguf` inside a `models/` directory (or set the `LINGSHU_MODEL_DIR` environment variable to their location) and launch the backend or the demo Gradio interface:
 
 ```bash
 pip install -r requirements.txt
