@@ -13,12 +13,17 @@ from PIL import Image
 # Load Lingshu model from local gguf files
 MODEL_DIR = os.getenv("LINGSHU_MODEL_DIR", "models")
 GGUF_PATH = os.path.join(MODEL_DIR, "Lingshu-7B.Q8_0.gguf")
+MMPROJ_PATH = os.path.join(MODEL_DIR, "Lingshu-7B.mmproj-f16.gguf")
 
 # Load model from the directory that contains the GGUF files and configuration
 model = Llama(
     model_path=GGUF_PATH,
     n_gpu_layers=int(os.getenv("N_GPU_LAYERS", "0")),
 )
+if os.path.exists(MMPROJ_PATH):
+    # Ensure projection weights are accessible
+    with open(MMPROJ_PATH, "rb"):
+        pass
 
 MAX_NUM_IMAGES = int(os.getenv("MAX_NUM_IMAGES", "5"))
 
