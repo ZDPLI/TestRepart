@@ -19,13 +19,13 @@ def _load():
     global _model, _processor
     if _model is None:
         _model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-            GGUF_PATH,
+            MODEL_DIR,
             torch_dtype=torch.bfloat16,
             device_map="auto",
             mmproj_file=MMPROJ_PATH,
             local_files_only=True,
         )
-        _processor = AutoProcessor.from_pretrained(GGUF_PATH, local_files_only=True)
+        _processor = AutoProcessor.from_pretrained(MODEL_DIR, local_files_only=True)
 
 
 def reason(messages: list[dict], system_prompt: str, max_new_tokens: int = 256) -> str:

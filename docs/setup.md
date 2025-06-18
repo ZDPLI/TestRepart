@@ -5,7 +5,11 @@
 pip install -r requirements.txt
 ```
 
-2. Download the Lingshu model files `Lingshu-7B.Q8_0.gguf` and `Lingshu-7B.mmproj-f16.gguf` and place them in a `models/` directory. Alternatively set the environment variable `LINGSHU_MODEL_DIR` to the directory containing these files.
+2. Download the Lingshu model repository and place it in a `models/` directory.
+   The directory should contain the GGUF files (`Lingshu-7B.Q8_0.gguf` and
+   `Lingshu-7B.mmproj-f16.gguf`) as well as the accompanying configuration files.
+   Alternatively set the environment variable `LINGSHU_MODEL_DIR` to that
+   directory.
 
 3. (Optional) Verify GPU availability:
 ```bash

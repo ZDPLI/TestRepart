@@ -23,15 +23,16 @@ MODEL_DIR = os.getenv("LINGSHU_MODEL_DIR", "models")
 GGUF_PATH = os.path.join(MODEL_DIR, "Lingshu-7B.Q8_0.gguf")
 MMPROJ_PATH = os.path.join(MODEL_DIR, "Lingshu-7B.mmproj-f16.gguf")
 
+# Load model from the directory that contains the GGUF files and configuration
 model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-    GGUF_PATH,
+    MODEL_DIR,
     torch_dtype=torch.bfloat16,
     device_map="auto",
     mmproj_file=MMPROJ_PATH,
     local_files_only=True,
 )
 
-processor = AutoProcessor.from_pretrained(GGUF_PATH, local_files_only=True)
+processor = AutoProcessor.from_pretrained(MODEL_DIR, local_files_only=True)
 
 MAX_NUM_IMAGES = int(os.getenv("MAX_NUM_IMAGES", "5"))
 
