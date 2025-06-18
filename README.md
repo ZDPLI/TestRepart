@@ -26,3 +26,13 @@ python webui.py        # Gradio web interface
 
 Then open `frontend/index.html` in a browser to interact with the chatbot interface.
 
+
+## Documentation
+
+Detailed documentation can be found in the `docs/` directory:
+
+- [Overview](docs/overview.md)
+- [Setup guide](docs/setup.md)
+- [API reference](docs/api.md)
+- [Usage guide](docs/usage.md)
+- [Admin guide](docs/admin.md)
