@@ -1,39 +1,40 @@
 import os
-from collections.abc import Iterator
-
-import gradio as gr
-import spaces
-from loguru import logger
-from llama_cpp import Llama
-import torch
 import re
 import tempfile
+from collections.abc import Iterator
+from threading import Thread
+
 import cv2
+import gradio as gr
+import spaces
+import torch
+from loguru import logger
 from PIL import Image
+from transformers import (
+    AutoProcessor,
+    TextIteratorStreamer,
+    Qwen2_5_VLForConditionalGeneration,
+)
+from qwen_vl_utils import process_vision_info
+from system_prompt import DEFAULT_SYSTEM_PROMPT
 
 # Load Lingshu model from local gguf files
 MODEL_DIR = os.getenv("LINGSHU_MODEL_DIR", "models")
 GGUF_PATH = os.path.join(MODEL_DIR, "Lingshu-7B.Q8_0.gguf")
 MMPROJ_PATH = os.path.join(MODEL_DIR, "Lingshu-7B.mmproj-f16.gguf")
 
-# Load model with optional GPU acceleration
-def _detect_gpu_layers() -> int:
-    env = os.getenv("N_GPU_LAYERS")
-    if env is not None:
-        return int(env)
-    return -1 if torch.cuda.is_available() else 0
-
-
-model = Llama(
-    model_path=GGUF_PATH,
-    n_gpu_layers=_detect_gpu_layers(),
+model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+    GGUF_PATH,
+    torch_dtype=torch.bfloat16,
+    device_map="auto",
+    mmproj_file=MMPROJ_PATH,
+    local_files_only=True,
 )
-if os.path.exists(MMPROJ_PATH):
-    # Ensure projection weights are accessible
-    with open(MMPROJ_PATH, "rb"):
-        pass
+
+processor = AutoProcessor.from_pretrained(GGUF_PATH, local_files_only=True)
 
 MAX_NUM_IMAGES = int(os.getenv("MAX_NUM_IMAGES", "5"))
+
 
 
 def count_files_in_new_message(paths: list[str]) -> tuple[int, int]:
@@ -174,30 +175,44 @@ def process_history(history: list[dict]) -> list[dict]:
 
 
 @spaces.GPU(duration=120)
-def run(message: dict, history: list[dict], system_prompt: str = "", max_new_tokens: int = 2048) -> Iterator[str]:
-    """Generate a reply using llama.cpp and stream tokens back."""
+def run(message: dict, history: list[dict], system_prompt: str = DEFAULT_SYSTEM_PROMPT, max_new_tokens: int = 2048) -> Iterator[str]:
+    """Generate a reply using the Lingshu model and stream tokens back."""
 
-    messages = [
-        {"role": item["role"], "content": item["content"]}
-        for item in history
-    ]
-    messages.append({"role": "user", "content": message["text"]})
+    if not validate_media_constraints(message, history):
+        yield ""
+        return
 
-    conversation = "\n".join(f"{m['role']}: {m['content']}" for m in messages)
-    prompt = f"{system_prompt}\n{conversation}\nassistant:"
+    messages = []
+    if system_prompt:
+        messages.append({"role": "system", "content": [{"type": "text", "text": system_prompt}]})
+    messages.extend(process_history(history))
+    messages.append({"role": "user", "content": process_new_user_message(message)})
 
-    stream = model.create_completion(
-        prompt,
-        max_tokens=max_new_tokens,
+    text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    image_inputs, video_inputs = process_vision_info(messages)
+    inputs = processor(
+        text=[text],
+        images=image_inputs,
+        videos=video_inputs,
+        padding=True,
+        return_tensors="pt",
+    )
+    inputs = inputs.to(model.device)
+
+    streamer = TextIteratorStreamer(processor, timeout=30.0, skip_prompt=True, skip_special_tokens=True)
+    generate_kwargs = dict(
+        inputs,
+        max_new_tokens=max_new_tokens,
+        streamer=streamer,
         temperature=0.7,
         top_p=1,
-        stream=True,
-        stop=["user:", "assistant:"],
+        repetition_penalty=1,
     )
+    t = Thread(target=model.generate, kwargs=generate_kwargs)
+    t.start()
 
     output = ""
-    for chunk in stream:
-        delta = chunk["choices"][0]["text"]
+    for delta in streamer:
         output += delta
         yield output
 
@@ -214,7 +229,7 @@ demo = gr.ChatInterface(
     textbox=gr.MultimodalTextbox(file_types=["image", ".mp4"], file_count="multiple", autofocus=True),
     multimodal=True,
     additional_inputs=[
-        gr.Textbox(label="System Prompt", value="You are a helpful medical expert."),
+        gr.Textbox(label="System Prompt", value=DEFAULT_SYSTEM_PROMPT),
         gr.Slider(label="Max New Tokens", minimum=100, maximum=8192, step=10, value=2048),
     ],
     stop_btn=False,

@@ -10,7 +10,7 @@ Before chatting you must register and log in to obtain an authentication token. 
 
 ## 2. Gradio Demo
 
-Run `python webui.py` to start the Gradio interface. It supports text, images and video inputs and lets you specify a system prompt. The interface streams model output in real time.
+Run `python webui.py` to start the Gradio interface. It supports text, images and video inputs and applies a default medical system prompt. You can modify this prompt in the UI. The interface streams model output in real time.
 
 ## Localization
 

@@ -19,10 +19,8 @@ Install dependencies from `requirements.txt`. Download the Lingshu model
 repository and place it in a `models/` directory (or point the
 `LINGSHU_MODEL_DIR` environment variable to that directory). The directory
 should contain the `Lingshu-7B.Q8_0.gguf` file together with the
-`Lingshu-7B.mmproj-f16.gguf` projection weights. The application uses
-`llama-cpp-python` and will automatically enable GPU acceleration when a CUDA
-device is available. Set the `N_GPU_LAYERS` environment variable to override the
-automatic choice. Then launch
+`Lingshu-7B.mmproj-f16.gguf` projection weights. The application loads the model
+with `transformers` and automatically uses the GPU when available. Then launch
 the backend or the demo Gradio interface:
 
 ```bash
@@ -44,6 +42,11 @@ curl -X POST http://localhost:5000/auth/login -H 'Content-Type: application/json
 
 The login request returns a token which must be provided in the `Authorization`
 header when calling `/chat`.
+
+### System Prompt
+
+The application ships with a default prompt optimised for helping general practitioners. It
+is automatically applied in the Gradio demo but can be overridden if needed.
 
 
 ## Documentation

@@ -7,6 +7,7 @@ from reasoning.chain import reason
 from episodic_memory.memory import store
 from user_system.auth import bp as auth_bp, verify_token
 from admin_panel.panel import bp as admin_bp
+from system_prompt import DEFAULT_SYSTEM_PROMPT
 
 app = Flask(__name__)
 app.register_blueprint(auth_bp, url_prefix="/auth")
@@ -14,7 +15,7 @@ app.register_blueprint(admin_bp, url_prefix="/")
 
 MODEL_DIR = os.getenv("LINGSHU_MODEL_DIR", "models")
 
-SYSTEM_PROMPT = "You are a helpful medical assistant."
+SYSTEM_PROMPT = DEFAULT_SYSTEM_PROMPT
 
 @app.route('/chat', methods=['POST'])
 def chat():
