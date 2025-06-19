@@ -14,6 +14,9 @@ pip install -r requirements.txt
 ```bash
 python gpu_support/check_gpu.py
 ```
+   When a CUDA device is detected the application automatically places all
+   transformer layers on the GPU. This can be customised by setting the
+   `N_GPU_LAYERS` environment variable.
 
 4. Start the Flask backend:
 ```bash

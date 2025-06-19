@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import torch
 from llama_cpp import Llama
 
 
@@ -13,11 +14,19 @@ MMPROJ_PATH = os.path.join(MODEL_DIR, "Lingshu-7B.mmproj-f16.gguf")
 _model = None
 
 
+def _detect_gpu_layers() -> int:
+    """Return the number of layers to place on GPU."""
+    env = os.getenv("N_GPU_LAYERS")
+    if env is not None:
+        return int(env)
+    return -1 if torch.cuda.is_available() else 0
+
+
 def _load() -> None:
     """Initialise the llama.cpp model if it hasn't been loaded yet."""
     global _model
     if _model is None:
-        n_gpu_layers = int(os.getenv("N_GPU_LAYERS", "0"))
+        n_gpu_layers = _detect_gpu_layers()
         _model = Llama(model_path=GGUF_PATH, n_gpu_layers=n_gpu_layers)
         if os.path.exists(MMPROJ_PATH):
             # Load mm projection weights if available (not used directly by llama.cpp)

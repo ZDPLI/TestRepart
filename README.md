@@ -20,7 +20,9 @@ repository and place it in a `models/` directory (or point the
 `LINGSHU_MODEL_DIR` environment variable to that directory). The directory
 should contain the `Lingshu-7B.Q8_0.gguf` file together with the
 `Lingshu-7B.mmproj-f16.gguf` projection weights. The application uses
-`llama-cpp-python` to run the model with optional GPU acceleration. Then launch
+`llama-cpp-python` and will automatically enable GPU acceleration when a CUDA
+device is available. Set the `N_GPU_LAYERS` environment variable to override the
+automatic choice. Then launch
 the backend or the demo Gradio interface:
 
 ```bash

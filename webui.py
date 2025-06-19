@@ -5,6 +5,7 @@ import gradio as gr
 import spaces
 from loguru import logger
 from llama_cpp import Llama
+import torch
 import re
 import tempfile
 import cv2
@@ -15,10 +16,17 @@ MODEL_DIR = os.getenv("LINGSHU_MODEL_DIR", "models")
 GGUF_PATH = os.path.join(MODEL_DIR, "Lingshu-7B.Q8_0.gguf")
 MMPROJ_PATH = os.path.join(MODEL_DIR, "Lingshu-7B.mmproj-f16.gguf")
 
-# Load model from the directory that contains the GGUF files and configuration
+# Load model with optional GPU acceleration
+def _detect_gpu_layers() -> int:
+    env = os.getenv("N_GPU_LAYERS")
+    if env is not None:
+        return int(env)
+    return -1 if torch.cuda.is_available() else 0
+
+
 model = Llama(
     model_path=GGUF_PATH,
-    n_gpu_layers=int(os.getenv("N_GPU_LAYERS", "0")),
+    n_gpu_layers=_detect_gpu_layers(),
 )
 if os.path.exists(MMPROJ_PATH):
     # Ensure projection weights are accessible
