@@ -19,6 +19,8 @@ If `docs_path` is supplied, files found at the path will be loaded via the RAG l
 ```json
 { "reply": "<assistant response>" }
 ```
+The request must include a token obtained from `/auth/login` in the
+`Authorization` header.
 
 ## `POST /auth/register`
 Register a new user. Body JSON must contain `username` and `password` fields.

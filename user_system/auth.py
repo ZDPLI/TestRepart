@@ -1,9 +1,12 @@
 from flask import Blueprint, request, jsonify
 import json
 import os
+import secrets
 from werkzeug.security import generate_password_hash, check_password_hash
 
 USER_DB = os.getenv("USER_DB", "user_system/users.json")
+
+_tokens: dict[str, str] = {}
 
 
 def _load_users() -> dict:
@@ -19,6 +22,11 @@ def _save_users(users: dict) -> None:
         json.dump(users, f)
 
 bp = Blueprint('auth', __name__)
+
+
+def verify_token(token: str) -> str | None:
+    """Return username associated with *token* or None."""
+    return _tokens.get(token)
 
 @bp.route('/register', methods=['POST'])
 def register():
@@ -42,4 +50,15 @@ def login():
     users = _load_users()
     if username not in users or not check_password_hash(users[username], password):
         return jsonify({'error': 'invalid credentials'}), 401
-    return jsonify({'status': 'logged_in'})
+    token = secrets.token_hex(16)
+    _tokens[token] = username
+    return jsonify({'token': token})
+
+
+@bp.route('/logout', methods=['POST'])
+def logout():
+    token = request.headers.get('Authorization')
+    if token and token in _tokens:
+        _tokens.pop(token, None)
+        return jsonify({'status': 'logged_out'})
+    return jsonify({'error': 'invalid token'}), 401

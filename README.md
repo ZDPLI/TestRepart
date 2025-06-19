@@ -31,6 +31,18 @@ python webui.py        # Gradio web interface
 
 Then open `frontend/index.html` in a browser to interact with the chatbot interface.
 
+Authentication is token-based. Register and login first:
+
+```bash
+curl -X POST http://localhost:5000/auth/register -H 'Content-Type: application/json' \
+  -d '{"username":"user","password":"pass"}'
+curl -X POST http://localhost:5000/auth/login -H 'Content-Type: application/json' \
+  -d '{"username":"user","password":"pass"}'
+```
+
+The login request returns a token which must be provided in the `Authorization`
+header when calling `/chat`.
+
 
 ## Documentation
 

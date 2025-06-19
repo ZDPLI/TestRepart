@@ -5,7 +5,7 @@ from rag.loader import load_documents
 from websearch.search import search_web
 from reasoning.chain import reason
 from episodic_memory.memory import store
-from user_system.auth import bp as auth_bp
+from user_system.auth import bp as auth_bp, verify_token
 from admin_panel.panel import bp as admin_bp
 
 app = Flask(__name__)
@@ -18,6 +18,10 @@ SYSTEM_PROMPT = "You are a helpful medical assistant."
 
 @app.route('/chat', methods=['POST'])
 def chat():
+    token = request.headers.get('Authorization')
+    if not verify_token(token or ''):
+        return jsonify({'error': 'unauthorized'}), 401
+
     data = request.get_json(force=True)
     message = data.get('message', '')
     docs_path = data.get('docs_path')
@@ -33,7 +37,8 @@ def chat():
         convo.append({'role': 'user', 'content': search_snippets})
 
     reply = reason(convo, system_prompt=SYSTEM_PROMPT)
-    store({'message': message, 'reply': reply})
+    username = verify_token(token or '')
+    store({'user': username, 'message': message, 'reply': reply})
     return jsonify({'reply': reply})
 
 if __name__ == '__main__':

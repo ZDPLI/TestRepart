@@ -1,12 +1,13 @@
 document.getElementById('send').addEventListener('click', async () => {
     const input = document.getElementById('input');
+    const token = document.getElementById('token').value;
     const text = input.value;
     if (!text) return;
     appendMessage('You', text);
     input.value = '';
     const response = await fetch('/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': token },
         body: JSON.stringify({ message: text })
     });
     const data = await response.json();
